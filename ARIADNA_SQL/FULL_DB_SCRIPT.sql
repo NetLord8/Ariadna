@@ -1,12 +1,5 @@
 --
--- Create Database Script
---   Database Version          : 11.2.0.4.0
---   Database Compatible Level : 11.2.0.4.0
---   Toad Version              : 12.7.1.11
---   DB Connect String         : MED.WORLD
---   Script Created by         : SYSTEM
---   Script Created at         : 17/05/2016 14:42:02
---   Notes                     : 
+-- Необходимо прогнать данный скрипт перед импортом базы заменив пути на актуальные                     : 
 --
 
 CREATE TABLESPACE DATA DATAFILE 
