@@ -1,1 +1,0 @@
-select * from send_message st
