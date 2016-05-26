@@ -17,7 +17,7 @@ CREATE OR REPLACE package body SOLUTION_MED.PKG_UNIQUE_Aterisk as
     pragma autonomous_transaction; --создает локальную транзакцию
   begin
     if d_spec_lu in (88982000,--  Водитель
-89541,--  Водитель выходного дня
+89541,----  Водитель выходного дня
 88916000,--  Массажист
 89416,--  Медсестра по физиотерапии
 89194000,--  Медсестра по ФТЛ
