@@ -643,6 +643,26 @@ and trunc(c.plan_dat)=trunc(sysdate+14)
 commit;
 
   end upload_crm_row;
+  --записываем факт визита на основе полученной услуги
+ procedure set_visit_fact
+as
+  begin
   
+  for rc in
+    (
+    select patientid,placeid,trunc(dat) as dat FROM patserv e WHERE srv_status=1
+and dat<trunc(sysdate) 
+and dat>trunc(sysdate)-5
+    )
+    loop
+      update 
+      autodialout a
+      set
+      a.visit_fact=1
+      where 
+      trunc(a.datetotell)=rc.dat and a.filial=rc.placeid and a.patient_id=rc.patientid;
+    end loop;
+    commit;  
+    end; 
 end PKG_UNIQUE_Aterisk;
 /
