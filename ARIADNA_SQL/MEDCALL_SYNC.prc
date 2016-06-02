@@ -1,6 +1,6 @@
 CREATE OR REPLACE procedure SOLUTION_MED.MEDCALL_SYNC
 as
-p_pat_call number;
+p_pat_call number;  --номер пациента
 p_num_call varchar2(100);
 p_num_call2 varchar2(100);
 p_num_call3 varchar2(100);
@@ -21,7 +21,7 @@ doc_d number :=0;--id врача на отделении
 res varchar(126):=''; 
 v_pat_id number; 
 exception_pat number:=0;--переменная нужна чтобы узнать мсключен ли пациент или нет 
-patient_id number:=0; --номер пациента, добавлен 02.06.2015
+
 begin
 
 --проверим на вшивость то что уже есть.
@@ -362,16 +362,16 @@ attr.linkid=rc.pat_id;
      then 
          res_medcall:='92';
        ---все равно добавляем запись со статусом 92
-  insert into autodialout (dialnum,dialnum2,dialnum3,datetime,type,datetotell,datebeg,mis_code,tn,finance,filial,visit_id,result)
-  values                           (rc.dialnum,rc.dialnum2,rc.dialnum3,rc.date_sys,rc.spescode,rc.dat,rc.updatedate,rc.reg_code,rc.keyid,rc.finance,rc.dep,rc.visitid,res_medcall);
+  insert into autodialout (dialnum,dialnum2,dialnum3,datetime,type,datetotell,datebeg,mis_code,tn,finance,filial,visit_id,result,patient_id)
+  values                           (rc.dialnum,rc.dialnum2,rc.dialnum3,rc.date_sys,rc.spescode,rc.dat,rc.updatedate,rc.reg_code,rc.keyid,rc.finance,rc.dep,rc.visitid,res_medcall,rc.pat_id);
 
 
      else   
          res_medcall:='0';
     ---иначе добавляем                
    -- dbms_output.put_line('новый пациент '||rc.dialnum);
-     insert into autodialout(dialnum,dialnum2,dialnum3,datetime,type,datetotell,datebeg,mis_code,tn,finance,filial,visit_id)
-  values                           (rc.dialnum,rc.dialnum2,rc.dialnum3,rc.date_sys,rc.spescode,rc.dat,rc.updatedate,rc.reg_code,rc.keyid,rc.finance,rc.dep,rc.visitid);
+     insert into autodialout(dialnum,dialnum2,dialnum3,datetime,type,datetotell,datebeg,mis_code,tn,finance,filial,visit_id,patient_id)
+  values                           (rc.dialnum,rc.dialnum2,rc.dialnum3,rc.date_sys,rc.spescode,rc.dat,rc.updatedate,rc.reg_code,rc.keyid,rc.finance,rc.dep,rc.visitid,rc.pat_id);
  
     end if;
     commit;
