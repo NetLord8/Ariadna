@@ -31,15 +31,25 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
   end;
 
   procedure materialsforServ(p_patserv            IN NUMBER
-                            ,p_srvdep             IN NUMBER
+                            ,p_srvdep             IN  NUMBER
                             ,p_is_research_create IN NUMBER
                             ,rc1                  IN OUT pkg_global.ref_cursor_type) as
   
     emp_cv      pkg_global.ref_cursor_type;
     patserv_rec patserv%rowtype;
     srvdep_rec  srvdep%rowtype;
+    p_srvdep_i number;
   
   begin
+  p_srvdep_i:=p_srvdep;
+  /*test begin
+  if (p_srvdep is null) then 
+  p_srvdep_i:=SYS_CONTEXT ('CLIENTCONTEXT', 'p_srvdep' );
+  
+  else
+  p_srvdep_i:=p_srvdep;
+  end if;
+  DBMS_SESSION.SET_CONTEXT ( 'CLIENTCONTEXT', 'p_srvdep', null); --test end*/
   
     if nvl(p_patserv, 0) <> 0 then
       OPEN emp_cv FOR 'SELECT * FROM solution_med.patserv WHERE keyid = ' || p_patserv;
@@ -50,7 +60,7 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
       FETCH emp_cv
         INTO srvdep_rec;
     else
-      OPEN emp_cv FOR 'SELECT * FROM solution_med.srvdep WHERE keyid = ' || p_srvdep;
+      OPEN emp_cv FOR 'SELECT * FROM solution_med.srvdep WHERE keyid = ' || p_srvdep_i;
       FETCH emp_cv
         INTO srvdep_rec;
     end if;
@@ -97,7 +107,7 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
          from solution_lab.lu l
             , solution_lab.lu_lu ll
             , solution_lab.lu s
-        where l.serv_id = p_srvdep--1984
+        where l.serv_id = p_srvdep_i--1984
           and l.status = 1
           and ll.lu_to_id = l.id
           and s.id = ll.lu_from_id
@@ -138,6 +148,7 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
     materialid := 0;
     material   := '';
     mat_lu_id  := 0;
+   -- DBMS_SESSION.SET_CONTEXT ( 'CLIENTCONTEXT', 'p_srvdep', p_srvdep); --test
   
     if nvl(p_patserv, 0) <> 0 then
       OPEN emp_cv FOR 'SELECT * FROM solution_med.patserv WHERE keyid = ' || p_patserv;
@@ -212,6 +223,8 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
     p_rc2                pkg_global.ref_cursor_type;
     
     p_service_id        number;
+    
+    
   begin
   
     select *
@@ -348,7 +361,7 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
       commit;
     
     end loop;
-  
+  --raise_application_error(-20000, 'Заказ успешно создан - смотрите во вкладе лаб.заказы. Это не ошибка',false);  --тестовая заглушка на случай если не будет иных вариантов
     open rc1 for
       select pkg_global.err_no as error_code
             ,PATSERVMATERARRAY as error_text
