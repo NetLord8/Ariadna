@@ -362,6 +362,7 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
     
     end loop;
   --raise_application_error(-20000, 'Заказ успешно создан - смотрите во вкладе лаб.заказы. Это не ошибка',false);  --тестовая заглушка на случай если не будет иных вариантов
+    
     open rc1 for
       select pkg_global.err_no as error_code
             ,PATSERVMATERARRAY as error_text
