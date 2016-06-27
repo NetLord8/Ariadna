@@ -42,14 +42,15 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
   
   begin
   p_srvdep_i:=p_srvdep;
-  /*test begin
-  if (p_srvdep is null) then 
+  --/*test begin
+  if (p_srvdep is null) then ----получение из сессии номера услуги, костыль, не передается параметр в sql_ServToLabMaterialsforServ2, тянем его из materialsforServCount
   p_srvdep_i:=SYS_CONTEXT ('CLIENTCONTEXT', 'p_srvdep' );
-  
+  DBMS_OUTPUT.put_line(SYS_CONTEXT ('CLIENTCONTEXT', 'p_srvdep' ));
   else
   p_srvdep_i:=p_srvdep;
   end if;
-  DBMS_SESSION.SET_CONTEXT ( 'CLIENTCONTEXT', 'p_srvdep', null); --test end*/
+  
+   --test end*/
   
     if nvl(p_patserv, 0) <> 0 then
       OPEN emp_cv FOR 'SELECT * FROM solution_med.patserv WHERE keyid = ' || p_patserv;
@@ -148,8 +149,8 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
     materialid := 0;
     material   := '';
     mat_lu_id  := 0;
-   -- DBMS_SESSION.SET_CONTEXT ( 'CLIENTCONTEXT', 'p_srvdep', p_srvdep); --test
-  
+    DBMS_SESSION.SET_CONTEXT ( 'CLIENTCONTEXT', 'p_srvdep', p_srvdep); --отправка в сессию номера услуги, костыль, не передается параметр в sql_ServToLabMaterialsforServ2, тянем его для materialsforServ
+    
     if nvl(p_patserv, 0) <> 0 then
       OPEN emp_cv FOR 'SELECT * FROM solution_med.patserv WHERE keyid = ' || p_patserv;
       FETCH emp_cv
@@ -221,7 +222,7 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
     order_info_first_id  number;
     order_info_second_id number;
     p_rc2                pkg_global.ref_cursor_type;
-    
+    placeid             number; -- медцентр
     p_service_id        number;
     
     
@@ -285,10 +286,16 @@ CREATE OR REPLACE PACKAGE BODY SOLUTION_MED.pkg_servtolab IS
         into material_row 
         from solution_lab.lu
        where id = rec.servmaterialid;
+       
       select *
         into patserv_row
         from solution_med.patserv
        where keyid = rec.patservid;
+       
+       --добавляем мед.центр из услуги в лаб. заказ
+       update solution_lab.research
+       set placeid=patserv_row.placeid
+       where id=researchid;
       
       begin
         select id
